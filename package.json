@@ -7,7 +7,7 @@
   "scripts": {
     "server": "node server",
     "server:dev": "nodemon server",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "test": "cross-env LOG_DISABLED=true NODE_NO_WARNINGS=1 NODE_OPTIONS=--experimental-vm-modules jest",
     "test:coverage": "npm run test -- --coverage",
     "test:watch": "npm run test -- --watch"
   },

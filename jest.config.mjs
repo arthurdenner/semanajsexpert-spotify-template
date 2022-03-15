@@ -16,6 +16,7 @@ const defaultConfig = {
 };
 
 export default {
+  clearMocks: true,
   projects: [
     {
       ...defaultConfig,

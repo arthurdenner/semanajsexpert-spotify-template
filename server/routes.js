@@ -29,7 +29,12 @@ async function routes(request, response) {
   // Request for files
   if (method === 'GET') {
     const { stream, type } = await controller.getFileStream(url);
-    response.writeHead(200, { 'Content-Type': constants.contentType[type] });
+    const contentType = constants.contentType[type];
+
+    if (contentType) {
+      response.writeHead(200, { 'Content-Type': contentType });
+    }
+
     return stream.pipe(response);
   }
 
