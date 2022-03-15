@@ -1,20 +1,20 @@
-import { createReadStream } from 'fs';
-import { access } from 'fs/promises';
-import { extname, join } from 'path';
+import fs from 'fs';
+import fsPromises from 'fs/promises';
+import path from 'path';
 import config from './config.js';
 
 const { publicDirectory } = config.dir;
 
 export class Service {
   createFileStream(filename) {
-    return createReadStream(filename);
+    return fs.createReadStream(filename);
   }
 
   async getFileInfo(filename) {
-    const fullPath = join(publicDirectory, filename);
+    const fullPath = path.join(publicDirectory, filename);
     // validate existence of file
-    await access(fullPath);
-    const filetype = extname(fullPath);
+    await fsPromises.access(fullPath);
+    const filetype = path.extname(fullPath);
 
     return {
       name: fullPath,
