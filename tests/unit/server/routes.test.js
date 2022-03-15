@@ -10,7 +10,7 @@ const {
   pages,
 } = config;
 
-describe('# Routes - test site for api response', () => {
+describe('# Routes', () => {
   test('GET / - should redirect to home page', async () => {
     const params = TestUtil.getHandleParams({ url: '/' });
 
@@ -57,7 +57,6 @@ describe('# Routes - test site for api response', () => {
     const expectedType = '.html';
     const params = TestUtil.getHandleParams({ url: filename });
     const mockFileStream = TestUtil.generateReadableStream(['data']);
-
     const getFileStreamSpy = jest
       .spyOn(Controller.prototype, 'getFileStream')
       .mockResolvedValue({ stream: mockFileStream, type: expectedType });
@@ -77,7 +76,6 @@ describe('# Routes - test site for api response', () => {
     const expectedType = '.ext';
     const params = TestUtil.getHandleParams({ url: filename });
     const mockFileStream = TestUtil.generateReadableStream(['data']);
-
     const getFileStreamSpy = jest
       .spyOn(Controller.prototype, 'getFileStream')
       .mockResolvedValue({ stream: mockFileStream, type: expectedType });
@@ -105,26 +103,26 @@ describe('# Routes - test site for api response', () => {
   describe('exceptions', () => {
     test('given inexistent file it should respond with 404', async () => {
       const params = TestUtil.getHandleParams({ url: '/index.png' });
-
-      jest
+      const getFileStreamSpy = jest
         .spyOn(Controller.prototype, 'getFileStream')
         .mockRejectedValue(new Error('Error: ENOENT: no such file or directy'));
 
       await handler(...params.values());
 
+      expect(getFileStreamSpy).toBeCalledWith('/index.png');
       expect(params.response.writeHead).toHaveBeenCalledWith(404);
       expect(params.response.end).toHaveBeenCalled();
     });
 
     test('given an error it should respond with 500', async () => {
       const params = TestUtil.getHandleParams({ url: '/index.png' });
-
-      jest
+      const getFileStreamSpy = jest
         .spyOn(Controller.prototype, 'getFileStream')
         .mockRejectedValue(new Error('Error:'));
 
       await handler(...params.values());
 
+      expect(getFileStreamSpy).toBeCalledWith('/index.png');
       expect(params.response.writeHead).toHaveBeenCalledWith(500);
       expect(params.response.end).toHaveBeenCalled();
     });
