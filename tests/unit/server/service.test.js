@@ -31,6 +31,34 @@ describe('# Service', () => {
     });
   });
 
+  describe('getFileInfo', () => {
+    test('should return name and type when file exists', async () => {
+      const mockFileStream = TestUtil.generateReadableStream(['data']);
+      const accessSpy = jest.spyOn(fsPromises, 'access').mockReturnValue(null);
+      const createFileStreamSpy = jest
+        .spyOn(service, 'createFileStream')
+        .mockReturnValue(mockFileStream);
+      const result = await service.getFileStream(file);
+
+      expect(result).toEqual({ stream: mockFileStream, type: fileType });
+      expect(accessSpy).toBeCalledWith(fileFullPath);
+      expect(createFileStreamSpy).toBeCalledWith(fileFullPath);
+    });
+
+    test("should throw when file doesn't exist", async () => {
+      const accessSpy = jest
+        .spyOn(fsPromises, 'access')
+        .mockRejectedValue(new Error('ENOENT'));
+      const createFileStreamSpy = jest
+        .spyOn(service, 'createFileStream')
+        .mockReturnValue(null);
+
+      expect(service.getFileInfo(file)).rejects.toThrow(/ENOENT/);
+      expect(accessSpy).toBeCalledWith(fileFullPath);
+      expect(createFileStreamSpy).not.toBeCalled();
+    });
+  });
+
   describe('getFileStream', () => {
     test('should return stream and type when file exists', async () => {
       const mockFileStream = TestUtil.generateReadableStream(['data']);
@@ -57,35 +85,6 @@ describe('# Service', () => {
 
       expect(service.getFileStream(file)).rejects.toThrow(/ENOENT/);
       expect(getFileInfoSpy).toBeCalledWith(file);
-      expect(createFileStreamSpy).not.toBeCalled();
-    });
-  });
-
-  describe('getFileInfo', () => {
-    test('should return name and type when file exists', async () => {
-      const mockFileStream = TestUtil.generateReadableStream(['data']);
-      const accessSpy = jest.spyOn(fsPromises, 'access').mockReturnValue(null);
-      const createFileStreamSpy = jest
-        .spyOn(service, 'createFileStream')
-        .mockReturnValue(mockFileStream);
-
-      const result = await service.getFileStream(file);
-
-      expect(result).toEqual({ stream: mockFileStream, type: fileType });
-      expect(accessSpy).toBeCalledWith(fileFullPath);
-      expect(createFileStreamSpy).toBeCalledWith(fileFullPath);
-    });
-
-    test("should throw when file doesn't exist", async () => {
-      const accessSpy = jest
-        .spyOn(fsPromises, 'access')
-        .mockRejectedValue(new Error('ENOENT'));
-      const createFileStreamSpy = jest
-        .spyOn(service, 'createFileStream')
-        .mockReturnValue(null);
-
-      expect(service.getFileInfo(file)).rejects.toThrow(/ENOENT/);
-      expect(accessSpy).toBeCalledWith(fileFullPath);
       expect(createFileStreamSpy).not.toBeCalled();
     });
   });
